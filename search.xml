@@ -19,4 +19,57 @@
         <tag>操作系统</tag>
       </tags>
   </entry>
+  <entry>
+    <title>【入门】学习一波Spring MVC中的跨重定向请求传递数据(URL模板、Flash属性)</title>
+    <url>/myblog/2020/06/22/%E3%80%90%E5%85%A5%E9%97%A8%E3%80%91%E5%AD%A6%E4%B9%A0%E4%B8%80%E6%B3%A2Spring%20MVC%E4%B8%AD%E7%9A%84%E8%B7%A8%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82%E4%BC%A0%E9%80%92%E6%95%B0%E6%8D%AE(URL%E6%A8%A1%E6%9D%BF%E3%80%81Flash%E5%B1%9E%E6%80%A7)/</url>
+    <content><![CDATA[<h2 id="1-写在开头的话"><a href="#1-写在开头的话" class="headerlink" title="1. 写在开头的话"></a>1. 写在开头的话</h2><p>在Spring MVC中，若是在控制器方法返回的视图名称中，使用了<code>redirect:</code>前缀，那么这个String就不再是用于查找视图了，即是用于让浏览器进行重定向的路径。当发生重定向了之后，之前的请求就会被作废，请求携带的数据也会被销毁，所以该如何保证数据在重定向时保持不变呢？（小知识点:如果使用<code>forward:</code>前缀则表示转发，转发宽泛的说是同一个请求，不同的视图，所以数据不会被销毁）</p>
+<p>   如果你了解过会话技术的话，你就会觉得这不是一个难题，利用会话技术就可以解决这个问题了，so easy!</p>
+<p>但是在这里我们并不讨论会话技术，讨论的是:</p>
+<ul>
+<li>使用URL模板以路径变量和/或查询参数的形式传递数据；</li>
+<li>通过flash属性发送数据</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="2-使用URL模板以路径变量和-或查询参数的形式传递数据"><a href="#2-使用URL模板以路径变量和-或查询参数的形式传递数据" class="headerlink" title="2.使用URL模板以路径变量和/或查询参数的形式传递数据"></a>2.使用URL模板以路径变量和/或查询参数的形式传递数据</h2><p>为了预防注入的危险，实际在开发过程中重定向不推荐如下写法:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/"</span>+user.getName();<span class="comment">//除了注入的危险，这里还会存在，如果用户名为中文的时候，会乱码</span></span><br></pre></td></tr></table></figure>
+
+<p>而是采用占位符的方式:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>采用这种方式，不安全的字符会被转义，同时你还可以增加一些额外的参数:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line">model.addAttribute(<span class="string">"age"</span>,user.getAge());</span><br><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>如果增加的属性没有在URL中匹配到占位符，则会以查询参数的方式附加到路径中。</p>
+<p>运行效果:</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci9pbWFnZS0yMDIwMDUyNzIwMTEzMTQyMy5wbmc?x-oss-process=image/format,png" alt="image-20200527201131423"></p>
+<h2 id="3-使用flash"><a href="#3-使用flash" class="headerlink" title="3.使用flash"></a>3.使用flash</h2><p>​        Spring通过<code>RedirectAttributes</code>来设置<code>flash</code>，使用其的好处便是你不用管理该对象的销毁，因为<code>flash</code>属性会一直携带这些数据到下一次请求，然后就消失，其实就是暂时将数据存到会话中，进行重定向之后，会从会话中取出这些数据，那么相应的会话就去掉这些数据了。</p>
+<p>​        通过<code>RedirectAttributes</code>提供一组<code>addFlashAttribute()</code>方法来添加flash属性:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/register"</span>,method = RequestMethod.POST)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">processRegistration</span><span class="params">(User user, RedirectAttributes model)</span>  </span>&#123;</span><br><span class="line">      model.addFlashAttribute(<span class="string">"user"</span>,user);</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"redirect:/userinfo"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="meta">@RequestMapping</span>(value = <span class="string">"/userinfo"</span>,method = RequestMethod.GET)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">showInfo</span><span class="params">(Model model)</span></span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"userinfo"</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>html：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span> <span class="attr">xmlns:th</span>=<span class="string">"http://www.thymeleaf.org"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">xmlns</span>=<span class="string">"http://www.w3.org/1999/xhtml"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>用户信息<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span> <span class="attr">th:text</span>=<span class="string">"|$&#123;user.getName()&#125;你好|"</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>运行结果:</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci8lRTclQTQlQkElRTglOEMlODMuZ2lm" alt="示范"></p>
+<p><strong>tips:如果涉及到路径含有占位符，而占位符中的可能的字符包含中文，那么会出现重定向的地址（你在方法内返回的地址）和实际地址（重定向后浏览器的地址栏的地址）是不一样的，因为你返回的地址是被转义过了，比如:</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">/userinfo/%xx%xx%xx ==&gt; 浏览器地址栏看到的是 /userinfo/张三</span><br><span class="line">    这个就会导致flash属性携带的值是交给了/userinfo/%xx%xx%xx 这个请求</span><br><span class="line">    而不是交给了 /userinfo/张三这个请求，最后就会导致你在处理这个请求时拿不到flash的值</span><br><span class="line">    尽管/userinfo/%xx%xx%xx转义是得到 /userinfo/张三</span><br></pre></td></tr></table></figure>
+
+<p>演示:</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci8lRTclQTQlQkElRTglOEMlODMyLmdpZg" alt="示范2"></p>
+<p>code:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/register"</span>,method = RequestMethod.POST)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">processRegistration</span><span class="params">(User user, RedirectAttributes model)</span>  </span>&#123;</span><br><span class="line">    model.addFlashAttribute(<span class="string">"user"</span>,user);</span><br><span class="line">    model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/userinfo/&#123;username&#125;"</span>,method = RequestMethod.GET)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">showInfo</span><span class="params">(@PathVariable String username,Model model)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"userinfo"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>JAVA</category>
+        <category>Spring</category>
+      </categories>
+      <tags>
+        <tag>Spring MVC</tag>
+        <tag>JAVA</tag>
+      </tags>
+  </entry>
 </search>
