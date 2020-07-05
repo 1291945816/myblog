@@ -20,6 +20,103 @@
       </tags>
   </entry>
   <entry>
+    <title>【入门】学习一波Spring MVC中的跨重定向请求传递数据(URL模板、Flash属性)</title>
+    <url>/myblog/2020/06/22/%E3%80%90%E5%85%A5%E9%97%A8%E3%80%91%E5%AD%A6%E4%B9%A0%E4%B8%80%E6%B3%A2Spring%20MVC%E4%B8%AD%E7%9A%84%E8%B7%A8%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82%E4%BC%A0%E9%80%92%E6%95%B0%E6%8D%AE(URL%E6%A8%A1%E6%9D%BF%E3%80%81Flash%E5%B1%9E%E6%80%A7)/</url>
+    <content><![CDATA[<h2 id="1-写在开头的话"><a href="#1-写在开头的话" class="headerlink" title="1. 写在开头的话"></a>1. 写在开头的话</h2><p>在Spring MVC中，若是在控制器方法返回的视图名称中，使用了<code>redirect:</code>前缀，那么这个String就不再是用于查找视图了，即是用于让浏览器进行重定向的路径。当发生重定向了之后，之前的请求就会被作废，请求携带的数据也会被销毁，所以该如何保证数据在重定向时保持不变呢？（小知识点:如果使用<code>forward:</code>前缀则表示转发，转发宽泛的说是同一个请求，不同的视图，所以数据不会被销毁）</p>
+<p>   如果你了解过会话技术的话，你就会觉得这不是一个难题，利用会话技术就可以解决这个问题了，so easy!</p>
+<p>但是在这里我们并不讨论会话技术，讨论的是:</p>
+<ul>
+<li>使用URL模板以路径变量和/或查询参数的形式传递数据；</li>
+<li>通过flash属性发送数据</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="2-使用URL模板以路径变量和-或查询参数的形式传递数据"><a href="#2-使用URL模板以路径变量和-或查询参数的形式传递数据" class="headerlink" title="2.使用URL模板以路径变量和/或查询参数的形式传递数据"></a>2.使用URL模板以路径变量和/或查询参数的形式传递数据</h2><p>为了预防注入的危险，实际在开发过程中重定向不推荐如下写法:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/"</span>+user.getName();<span class="comment">//除了注入的危险，这里还会存在，如果用户名为中文的时候，会乱码</span></span><br></pre></td></tr></table></figure>
+
+<p>而是采用占位符的方式:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br></pre></td></tr></table></figure>
+
+<p>采用这种方式，不安全的字符会被转义，同时你还可以增加一些额外的参数:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line">model.addAttribute(<span class="string">"age"</span>,user.getAge());</span><br><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>如果增加的属性没有在URL中匹配到占位符，则会以查询参数的方式附加到路径中。</p>
+<p>运行效果:</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci9pbWFnZS0yMDIwMDUyNzIwMTEzMTQyMy5wbmc?x-oss-process=image/format,png" alt="image-20200527201131423"></p>
+<h2 id="3-使用flash"><a href="#3-使用flash" class="headerlink" title="3.使用flash"></a>3.使用flash</h2><p>​        Spring通过<code>RedirectAttributes</code>来设置<code>flash</code>，使用其的好处便是你不用管理该对象的销毁，因为<code>flash</code>属性会一直携带这些数据到下一次请求，然后就消失，其实就是暂时将数据存到会话中，进行重定向之后，会从会话中取出这些数据，那么相应的会话就去掉这些数据了。</p>
+<p>​        通过<code>RedirectAttributes</code>提供一组<code>addFlashAttribute()</code>方法来添加flash属性:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/register"</span>,method = RequestMethod.POST)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">processRegistration</span><span class="params">(User user, RedirectAttributes model)</span>  </span>&#123;</span><br><span class="line">      model.addFlashAttribute(<span class="string">"user"</span>,user);</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"redirect:/userinfo"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="meta">@RequestMapping</span>(value = <span class="string">"/userinfo"</span>,method = RequestMethod.GET)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">showInfo</span><span class="params">(Model model)</span></span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"userinfo"</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>html：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span> <span class="attr">xmlns:th</span>=<span class="string">"http://www.thymeleaf.org"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">xmlns</span>=<span class="string">"http://www.w3.org/1999/xhtml"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>用户信息<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span> <span class="attr">th:text</span>=<span class="string">"|$&#123;user.getName()&#125;你好|"</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>运行结果:</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci8lRTclQTQlQkElRTglOEMlODMuZ2lm" alt="示范"></p>
+<p><strong>tips:如果涉及到路径含有占位符，而占位符中的可能的字符包含中文，那么会出现重定向的地址（你在方法内返回的地址）和实际地址（重定向后浏览器的地址栏的地址）是不一样的，因为你返回的地址是被转义过了，比如:</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">/userinfo/%xx%xx%xx ==&gt; 浏览器地址栏看到的是 /userinfo/张三</span><br><span class="line">    这个就会导致flash属性携带的值是交给了/userinfo/%xx%xx%xx 这个请求</span><br><span class="line">    而不是交给了 /userinfo/张三这个请求，最后就会导致你在处理这个请求时拿不到flash的值</span><br><span class="line">    尽管/userinfo/%xx%xx%xx转义是得到 /userinfo/张三</span><br></pre></td></tr></table></figure>
+
+<p>演示:</p>
+<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci8lRTclQTQlQkElRTglOEMlODMyLmdpZg" alt="示范2"></p>
+<p>code:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/register"</span>,method = RequestMethod.POST)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">processRegistration</span><span class="params">(User user, RedirectAttributes model)</span>  </span>&#123;</span><br><span class="line">    model.addFlashAttribute(<span class="string">"user"</span>,user);</span><br><span class="line">    model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/userinfo/&#123;username&#125;"</span>,method = RequestMethod.GET)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">showInfo</span><span class="params">(@PathVariable String username,Model model)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"userinfo"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>JAVA</category>
+        <category>Spring</category>
+      </categories>
+      <tags>
+        <tag>Spring MVC</tag>
+        <tag>JAVA</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>搭建Hadoop集群之环境配置系列-配置静态ip.md</title>
+    <url>/myblog/2020/07/05/%E6%90%AD%E5%BB%BAHadoop%E9%9B%86%E7%BE%A4%E4%B9%8B%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E7%B3%BB%E5%88%97-%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81ip-md/</url>
+    <content><![CDATA[<p>由于老师给我们学生布置了一个Linux作业，虽然有几个可选的题，但是最后我还是觉得选择Hadoop应用开发，毕竟我一直想尝试这个新东西，趁着这个机会学点东西挺好的。</p>
+<p>要想使用这个Hadoop进行应用开发，那么首先就应该配好环境，安装啥的不说了，因为我觉得这个配置静态ip有点麻烦，也最容易出问题，所以下面我将和你谈谈如何为你的hadoop集群服务器配置静态ip：</p>
+<a id="more"></a>
+
+<h2 id="为什么要配置静态ip"><a href="#为什么要配置静态ip" class="headerlink" title="为什么要配置静态ip?"></a>为什么要配置静态ip?</h2><p>使用静态ip就不用担心每次联网你自己局域网的ip发生改变，进而影响你搭建Hadoop集群。</p>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h3 id="1-查看虚拟网络编辑器"><a href="#1-查看虚拟网络编辑器" class="headerlink" title="1.查看虚拟网络编辑器"></a>1.查看虚拟网络编辑器</h3><p>首先打开你的虚拟机（我使用的是VMware Workstation），找到上方栏目编辑-&gt;虚拟网络编辑器，如下：</p>
+<p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705151543770.png" alt="image-20200705151543770"></p>
+<p>其后选择<strong>NAT设置</strong>,记下网关IP，如下:</p>
+<p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705151420601.png" alt="image-20200705151420601"></p>
+<p>记住之后，不用做什么，确定即可，返回Centos系统进行配置。</p>
+<h3 id="2-Centos内配置静态ip"><a href="#2-Centos内配置静态ip" class="headerlink" title="2.Centos内配置静态ip"></a>2.Centos内配置静态ip</h3><p>首先就是执行如下语句:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ifconfig</span><br></pre></td></tr></table></figure>
+
+<p>得到如下图:</p>
+<p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705152217315.png" alt="image-20200705152217315"></p>
+<p>根据上面得到一个网卡的名字ens33，那么下面就进行修改：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-ens33</span><br></pre></td></tr></table></figure>
+
+<p>修改内容，没有就新增即可:</p>
+<p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705152634374.png" alt="image-20200705152634374"></p>
+<p>继续执行:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sysconfig&#x2F;network</span><br></pre></td></tr></table></figure>
+
+<p>新增内容:</p>
+<p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705152804959.png" alt="image-20200705152804959"></p>
+<p>然后执行如下语句,重启网卡:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">service network restart</span><br></pre></td></tr></table></figure>
+
+<p>重启网卡成功即可发现ip已经被修改了:</p>
+<p><img src="D:%5CA_myFile%5Cblog%5Csource%5C_posts%5Cimage-20200705153029197.png" alt="image-20200705153029197"></p>
+<p>到这里没什么问题的话，已经是能够配置好静态ip的了，也能够正确访问外网，但是如果你的访问不了外网的话，可以试试下面的操作，找到Centos的有线连接,设置一下网关即可:</p>
+<p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705153355694.png" alt="image-20200705153355694"></p>
+<p>到这里就基本完成静态ip的配置了，对于其他的从机也是一样的操作，直接配置即可！</p>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Hadoop</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>修改equals方法时为什么还要重写hashcode方法?</title>
     <url>/myblog/2020/06/22/%E4%BF%AE%E6%94%B9equals%E6%96%B9%E6%B3%95%E6%97%B6%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%98%E8%A6%81%E9%87%8D%E5%86%99hashcode%E6%96%B9%E6%B3%95/</url>
     <content><![CDATA[<blockquote>
@@ -69,59 +166,6 @@
       </categories>
       <tags>
         <tag>JAVA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>【入门】学习一波Spring MVC中的跨重定向请求传递数据(URL模板、Flash属性)</title>
-    <url>/myblog/2020/06/22/%E3%80%90%E5%85%A5%E9%97%A8%E3%80%91%E5%AD%A6%E4%B9%A0%E4%B8%80%E6%B3%A2Spring%20MVC%E4%B8%AD%E7%9A%84%E8%B7%A8%E9%87%8D%E5%AE%9A%E5%90%91%E8%AF%B7%E6%B1%82%E4%BC%A0%E9%80%92%E6%95%B0%E6%8D%AE(URL%E6%A8%A1%E6%9D%BF%E3%80%81Flash%E5%B1%9E%E6%80%A7)/</url>
-    <content><![CDATA[<h2 id="1-写在开头的话"><a href="#1-写在开头的话" class="headerlink" title="1. 写在开头的话"></a>1. 写在开头的话</h2><p>在Spring MVC中，若是在控制器方法返回的视图名称中，使用了<code>redirect:</code>前缀，那么这个String就不再是用于查找视图了，即是用于让浏览器进行重定向的路径。当发生重定向了之后，之前的请求就会被作废，请求携带的数据也会被销毁，所以该如何保证数据在重定向时保持不变呢？（小知识点:如果使用<code>forward:</code>前缀则表示转发，转发宽泛的说是同一个请求，不同的视图，所以数据不会被销毁）</p>
-<p>   如果你了解过会话技术的话，你就会觉得这不是一个难题，利用会话技术就可以解决这个问题了，so easy!</p>
-<p>但是在这里我们并不讨论会话技术，讨论的是:</p>
-<ul>
-<li>使用URL模板以路径变量和/或查询参数的形式传递数据；</li>
-<li>通过flash属性发送数据</li>
-</ul>
-<a id="more"></a>
-
-<h2 id="2-使用URL模板以路径变量和-或查询参数的形式传递数据"><a href="#2-使用URL模板以路径变量和-或查询参数的形式传递数据" class="headerlink" title="2.使用URL模板以路径变量和/或查询参数的形式传递数据"></a>2.使用URL模板以路径变量和/或查询参数的形式传递数据</h2><p>为了预防注入的危险，实际在开发过程中重定向不推荐如下写法:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/"</span>+user.getName();<span class="comment">//除了注入的危险，这里还会存在，如果用户名为中文的时候，会乱码</span></span><br></pre></td></tr></table></figure>
-
-<p>而是采用占位符的方式:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br></pre></td></tr></table></figure>
-
-<p>采用这种方式，不安全的字符会被转义，同时你还可以增加一些额外的参数:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line">model.addAttribute(<span class="string">"age"</span>,user.getAge());</span><br><span class="line"><span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br></pre></td></tr></table></figure>
-
-
-
-<p>如果增加的属性没有在URL中匹配到占位符，则会以查询参数的方式附加到路径中。</p>
-<p>运行效果:</p>
-<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci9pbWFnZS0yMDIwMDUyNzIwMTEzMTQyMy5wbmc?x-oss-process=image/format,png" alt="image-20200527201131423"></p>
-<h2 id="3-使用flash"><a href="#3-使用flash" class="headerlink" title="3.使用flash"></a>3.使用flash</h2><p>​        Spring通过<code>RedirectAttributes</code>来设置<code>flash</code>，使用其的好处便是你不用管理该对象的销毁，因为<code>flash</code>属性会一直携带这些数据到下一次请求，然后就消失，其实就是暂时将数据存到会话中，进行重定向之后，会从会话中取出这些数据，那么相应的会话就去掉这些数据了。</p>
-<p>​        通过<code>RedirectAttributes</code>提供一组<code>addFlashAttribute()</code>方法来添加flash属性:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/register"</span>,method = RequestMethod.POST)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">processRegistration</span><span class="params">(User user, RedirectAttributes model)</span>  </span>&#123;</span><br><span class="line">      model.addFlashAttribute(<span class="string">"user"</span>,user);</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"redirect:/userinfo"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="meta">@RequestMapping</span>(value = <span class="string">"/userinfo"</span>,method = RequestMethod.GET)</span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">showInfo</span><span class="params">(Model model)</span></span>&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="string">"userinfo"</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<p>html：</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span> <span class="attr">xmlns:th</span>=<span class="string">"http://www.thymeleaf.org"</span></span></span><br><span class="line"><span class="tag">      <span class="attr">xmlns</span>=<span class="string">"http://www.w3.org/1999/xhtml"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>用户信息<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">h1</span> <span class="attr">th:text</span>=<span class="string">"|$&#123;user.getName()&#125;你好|"</span>&gt;</span><span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>运行结果:</p>
-<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci8lRTclQTQlQkElRTglOEMlODMuZ2lm" alt="示范"></p>
-<p><strong>tips:如果涉及到路径含有占位符，而占位符中的可能的字符包含中文，那么会出现重定向的地址（你在方法内返回的地址）和实际地址（重定向后浏览器的地址栏的地址）是不一样的，因为你返回的地址是被转义过了，比如:</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">/userinfo/%xx%xx%xx ==&gt; 浏览器地址栏看到的是 /userinfo/张三</span><br><span class="line">    这个就会导致flash属性携带的值是交给了/userinfo/%xx%xx%xx 这个请求</span><br><span class="line">    而不是交给了 /userinfo/张三这个请求，最后就会导致你在处理这个请求时拿不到flash的值</span><br><span class="line">    尽管/userinfo/%xx%xx%xx转义是得到 /userinfo/张三</span><br></pre></td></tr></table></figure>
-
-<p>演示:</p>
-<p><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tLzEyOTE5NDU4MTYvSW1hZ2VzL21hc3Rlci8lRTclQTQlQkElRTglOEMlODMyLmdpZg" alt="示范2"></p>
-<p>code:</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/register"</span>,method = RequestMethod.POST)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">processRegistration</span><span class="params">(User user, RedirectAttributes model)</span>  </span>&#123;</span><br><span class="line">    model.addFlashAttribute(<span class="string">"user"</span>,user);</span><br><span class="line">    model.addAttribute(<span class="string">"username"</span>,user.getName());</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"redirect:/userinfo/&#123;username&#125;"</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/userinfo/&#123;username&#125;"</span>,method = RequestMethod.GET)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">showInfo</span><span class="params">(@PathVariable String username,Model model)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"userinfo"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>JAVA</category>
-        <category>Spring</category>
-      </categories>
-      <tags>
-        <tag>JAVA</tag>
-        <tag>Spring MVC</tag>
       </tags>
   </entry>
 </search>

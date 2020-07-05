@@ -6,7 +6,7 @@
   <link href="/myblog/atom.xml" rel="self"/>
   
   <link href="http://1291945816.github.io/myblog/"/>
-  <updated>2020-06-22T14:07:07.557Z</updated>
+  <updated>2020-07-05T07:36:03.485Z</updated>
   <id>http://1291945816.github.io/myblog/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>搭建Hadoop集群之环境配置系列-配置静态ip.md</title>
+    <link href="http://1291945816.github.io/myblog/2020/07/05/%E6%90%AD%E5%BB%BAHadoop%E9%9B%86%E7%BE%A4%E4%B9%8B%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E7%B3%BB%E5%88%97-%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81ip-md/"/>
+    <id>http://1291945816.github.io/myblog/2020/07/05/%E6%90%AD%E5%BB%BAHadoop%E9%9B%86%E7%BE%A4%E4%B9%8B%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E7%B3%BB%E5%88%97-%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81ip-md/</id>
+    <published>2020-07-05T06:59:20.000Z</published>
+    <updated>2020-07-05T07:36:03.485Z</updated>
+    
+    <content type="html"><![CDATA[<p>由于老师给我们学生布置了一个Linux作业，虽然有几个可选的题，但是最后我还是觉得选择Hadoop应用开发，毕竟我一直想尝试这个新东西，趁着这个机会学点东西挺好的。</p><p>要想使用这个Hadoop进行应用开发，那么首先就应该配好环境，安装啥的不说了，因为我觉得这个配置静态ip有点麻烦，也最容易出问题，所以下面我将和你谈谈如何为你的hadoop集群服务器配置静态ip：</p><a id="more"></a><h2 id="为什么要配置静态ip"><a href="#为什么要配置静态ip" class="headerlink" title="为什么要配置静态ip?"></a>为什么要配置静态ip?</h2><p>使用静态ip就不用担心每次联网你自己局域网的ip发生改变，进而影响你搭建Hadoop集群。</p><h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h3 id="1-查看虚拟网络编辑器"><a href="#1-查看虚拟网络编辑器" class="headerlink" title="1.查看虚拟网络编辑器"></a>1.查看虚拟网络编辑器</h3><p>首先打开你的虚拟机（我使用的是VMware Workstation），找到上方栏目编辑-&gt;虚拟网络编辑器，如下：</p><p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705151543770.png" alt="image-20200705151543770"></p><p>其后选择<strong>NAT设置</strong>,记下网关IP，如下:</p><p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705151420601.png" alt="image-20200705151420601"></p><p>记住之后，不用做什么，确定即可，返回Centos系统进行配置。</p><h3 id="2-Centos内配置静态ip"><a href="#2-Centos内配置静态ip" class="headerlink" title="2.Centos内配置静态ip"></a>2.Centos内配置静态ip</h3><p>首先就是执行如下语句:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ifconfig</span><br></pre></td></tr></table></figure><p>得到如下图:</p><p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705152217315.png" alt="image-20200705152217315"></p><p>根据上面得到一个网卡的名字ens33，那么下面就进行修改：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-ens33</span><br></pre></td></tr></table></figure><p>修改内容，没有就新增即可:</p><p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705152634374.png" alt="image-20200705152634374"></p><p>继续执行:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;sysconfig&#x2F;network</span><br></pre></td></tr></table></figure><p>新增内容:</p><p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705152804959.png" alt="image-20200705152804959"></p><p>然后执行如下语句,重启网卡:</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service network restart</span><br></pre></td></tr></table></figure><p>重启网卡成功即可发现ip已经被修改了:</p><p><img src="D:%5CA_myFile%5Cblog%5Csource%5C_posts%5Cimage-20200705153029197.png" alt="image-20200705153029197"></p><p>到这里没什么问题的话，已经是能够配置好静态ip的了，也能够正确访问外网，但是如果你的访问不了外网的话，可以试试下面的操作，找到Centos的有线连接,设置一下网关即可:</p><p><img src="https://raw.githubusercontent.com/1291945816/Images/master/image-20200705153355694.png" alt="image-20200705153355694"></p><p>到这里就基本完成静态ip的配置了，对于其他的从机也是一样的操作，直接配置即可！</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;由于老师给我们学生布置了一个Linux作业，虽然有几个可选的题，但是最后我还是觉得选择Hadoop应用开发，毕竟我一直想尝试这个新东西，趁着这个机会学点东西挺好的。&lt;/p&gt;
+&lt;p&gt;要想使用这个Hadoop进行应用开发，那么首先就应该配好环境，安装啥的不说了，因为我觉得这个配置静态ip有点麻烦，也最容易出问题，所以下面我将和你谈谈如何为你的hadoop集群服务器配置静态ip：&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Linux" scheme="http://1291945816.github.io/myblog/categories/Linux/"/>
+    
+    
+      <category term="Hadoop" scheme="http://1291945816.github.io/myblog/tags/Hadoop/"/>
+    
+  </entry>
   
   <entry>
     <title>修改equals方法时为什么还要重写hashcode方法?</title>
@@ -68,9 +92,9 @@
       <category term="Spring" scheme="http://1291945816.github.io/myblog/categories/JAVA/Spring/"/>
     
     
-      <category term="JAVA" scheme="http://1291945816.github.io/myblog/tags/JAVA/"/>
-    
       <category term="Spring MVC" scheme="http://1291945816.github.io/myblog/tags/Spring-MVC/"/>
+    
+      <category term="JAVA" scheme="http://1291945816.github.io/myblog/tags/JAVA/"/>
     
   </entry>
   
