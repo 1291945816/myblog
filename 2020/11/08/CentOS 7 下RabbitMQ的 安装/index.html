@@ -20,20 +20,23 @@
     var CONFIG = {"hostname":"1291945816.github.io","root":"/myblog/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":"valine","storage":true,"lazyload":true,"nav":null,"activeClass":"valine"},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="开启一场技术的盛宴吧√">
-<meta property="og:type" content="website">
-<meta property="og:title" content="标签">
-<meta property="og:url" content="http://1291945816.github.io/myblog/tags/index.html">
+  <meta name="description" content="最近想深入学一下有关JAVA后台的一些中间件，这里选择了RabbitMQ消息中间件，并记录一下RabbitMQ的安装过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS 7 下RabbitMQ的 安装">
+<meta property="og:url" content="http://1291945816.github.io/myblog/2020/11/08/CentOS%207%20%E4%B8%8BRabbitMQ%E7%9A%84%20%E5%AE%89%E8%A3%85/index.html">
 <meta property="og:site_name" content="PiPi技术栈">
-<meta property="og:description" content="开启一场技术的盛宴吧√">
+<meta property="og:description" content="最近想深入学一下有关JAVA后台的一些中间件，这里选择了RabbitMQ消息中间件，并记录一下RabbitMQ的安装过程。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2020-06-21T17:03:41.000Z">
-<meta property="article:modified_time" content="2020-06-21T17:05:53.480Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/1291945816/Images/master/file_need.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/1291945816/Images/master/rabbit-server-img.png">
+<meta property="article:published_time" content="2020-11-08T09:59:43.000Z">
+<meta property="article:modified_time" content="2020-11-08T10:06:30.819Z">
 <meta property="article:author" content="Kilig">
-<meta property="article:tag" content="青春|技术">
+<meta property="article:tag" content="RabbitMQ">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/1291945816/Images/master/file_need.png">
 
-<link rel="canonical" href="http://1291945816.github.io/myblog/tags/">
+<link rel="canonical" href="http://1291945816.github.io/myblog/2020/11/08/CentOS%207%20%E4%B8%8BRabbitMQ%E7%9A%84%20%E5%AE%89%E8%A3%85/">
 
 
 <script id="page-configurations">
@@ -41,13 +44,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>标签 | PiPi技术栈
-</title>
+  <title>CentOS 7 下RabbitMQ的 安装 | PiPi技术栈</title>
   
 
 
@@ -191,51 +193,159 @@
       <div class="main-inner">
         <div class="content-wrap">
           
-  
-  
 
-          <div class="content page posts-expand">
+          <div class="content post posts-expand">
             
 
     
-    
-    
-    <div class="post-block" lang="zh-CN">
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://1291945816.github.io/myblog/2020/11/08/CentOS%207%20%E4%B8%8BRabbitMQ%E7%9A%84%20%E5%AE%89%E8%A3%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/myblog/images/kiligpng.png">
+      <meta itemprop="name" content="Kilig">
+      <meta itemprop="description" content="开启一场技术的盛宴吧√">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="PiPi技术栈">
+    </span>
       <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CentOS 7 下RabbitMQ的 安装
+        </h1>
 
-<h1 class="post-title" itemprop="name headline">标签
-</h1>
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
 
-<div class="post-meta">
+              <time title="创建时间：2020-11-08 17:59:43 / 修改时间：18:06:30" itemprop="dateCreated datePublished" datetime="2020-11-08T17:59:43+08:00">2020-11-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/myblog/categories/%E5%90%8E%E7%AB%AF/" itemprop="url" rel="index"><span itemprop="name">后端</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/myblog/categories/%E5%90%8E%E7%AB%AF/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/myblog/2020/11/08/CentOS%207%20%E4%B8%8BRabbitMQ%E7%9A%84%20%E5%AE%89%E8%A3%85/" class="post-meta-item leancloud_visitors" data-flag-title="CentOS 7 下RabbitMQ的 安装" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/myblog/2020/11/08/CentOS%207%20%E4%B8%8BRabbitMQ%E7%9A%84%20%E5%AE%89%E8%A3%85/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/myblog/2020/11/08/CentOS%207%20%E4%B8%8BRabbitMQ%E7%9A%84%20%E5%AE%89%E8%A3%85/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
   
 
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+      
+        <p>最近想深入学一下有关JAVA后台的一些中间件，这里选择了RabbitMQ消息中间件，并记录一下RabbitMQ的安装过程。</p>
+<a id="more"></a>
+
+<h2 id="1-下载所需的文件"><a href="#1-下载所需的文件" class="headerlink" title="1. 下载所需的文件"></a>1. 下载所需的文件</h2><p><img src="https://raw.githubusercontent.com/1291945816/Images/master/file_need.png" alt=""></p>
+<p>为了安装<code>rabbit-server</code>，你需要自己去下载上图所需的三个文件。除了以<code>rabbitmq-server</code>开头的这个文件外，其他是是安装Rabbitmq是必需的依赖环境，版本关系最好是官网查阅确定一下。我这里提供这三个文件的压缩包下载。</p>
+<blockquote>
+<p>链接：<a href="https://pan.baidu.com/s/1f2QCvx__tzT7aFrIx9KjjQ" target="_blank" rel="noopener">https://pan.baidu.com/s/1f2QCvx__tzT7aFrIx9KjjQ</a><br>提取码：0ijz </p>
+</blockquote>
+<p>不过还是推荐去官网下载 <a href="https://www.rabbitmq.com/" target="_blank" rel="noopener">官网</a></p>
+<h2 id="2-安装RabbitMQ"><a href="#2-安装RabbitMQ" class="headerlink" title="2.安装RabbitMQ"></a>2.安装RabbitMQ</h2><p>因为下载的文件是<code>rpm</code>类型的文件，所以这里使用<code>rpm</code>命令进行安装，该命令的具体使用自行百度。下面的是具体的安装命令:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 首先去到那三个文件的文件夹下</span></span><br><span class="line">cd /home # 这里是我文件的放置处</span><br><span class="line"><span class="meta">#</span><span class="bash"> 然后就执行下面命令即可 rabbit-server一定是最后安装的</span></span><br><span class="line">rpm -ivh ./socat-1.7.3.2-2.el7.x86_64.rpm</span><br><span class="line">rpm -ivh ./erlang-23.0.3-1.el7.x86_64.rpm </span><br><span class="line">rpm -ivh rabbitmq-server-3.8.9-1.el7.noarch.rpm</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-配置自启动并启动服务"><a href="#3-配置自启动并启动服务" class="headerlink" title="3.配置自启动并启动服务"></a>3.配置自启动并启动服务</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 配置自启动</span></span><br><span class="line">chkconfig rabbitmq-server on</span><br><span class="line"><span class="meta">#</span><span class="bash"> 为了能够使用网页版的后台管理，要启用后台管理插件</span></span><br><span class="line">rabbitmq-plugins enable rabbitmq_management</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动服务</span></span><br><span class="line">systemctl start rabbitmq-server</span><br></pre></td></tr></table></figure>
+
+<p>执行完上面的命令后，你通过在浏览器输入</p>
+<blockquote>
+<p><a href="http://server-ip:15672" target="_blank" rel="noopener">http://server-ip:15672</a> 这里server-ip是你服务器的ip或者你电脑的ip</p>
+</blockquote>
+<p>你应该能够看到这样的界面</p>
+<p><img src="https://raw.githubusercontent.com/1291945816/Images/master/rabbit-server-img.png" alt=""></p>
+<p>你如果输入默认账号:guest 密码:guest ，在其他电脑上就会显示图内的信息，这是说明该默认账号需要在本地登录才行，所以在这里我们需要去增加一个管理用户，使得能够登录该后台，下面是相关的命令:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rabbitmqctl add_user rabbitmq rabbitmq #这里后面两项分别是账户名以及密码</span><br><span class="line">rabbitmqctl set_user_tags fort administrator</span><br><span class="line">rabbitmqctl set_permissions -p / rabbitmq '.*' '.*' '.*' #这里是设置它的权限</span><br></pre></td></tr></table></figure>
+
+<p>上述三个命令就完成了创建一个rabbitmq用户，并且该用户能够在非本地的主机上登录后台。</p>
+<h2 id="4-注意点"><a href="#4-注意点" class="headerlink" title="4.注意点"></a>4.注意点</h2><p>上面就是RabbitMQ的一个简易安装过程,我之前曾想通过新增一个配置文件，进行配置，但是发现无论怎么做，它都是启动失败，找不到原因，但删掉那个文件便可以成功运行了。该问题可能要等到我后面继续深入学习才能回答了，所以在安装这个版本的时候，就先不要增加配置文件。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Hps
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://1291945816.github.io/myblog/2020/11/08/CentOS%207%20%E4%B8%8BRabbitMQ%E7%9A%84%20%E5%AE%89%E8%A3%85/" title="CentOS 7 下RabbitMQ的 安装">http://1291945816.github.io/myblog/2020/11/08/CentOS 7 下RabbitMQ的 安装/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
 </div>
 
-</header>
 
-      
-      
-      
-      <div class="post-body">
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-              目前共计 6 个标签
-            </div>
-            <div class="tag-cloud-tags">
-              <a href="/myblog/tags/C/" style="font-size: 12px; color: #ccc">C</a> <a href="/myblog/tags/Hadoop/" style="font-size: 12px; color: #ccc">Hadoop</a> <a href="/myblog/tags/JAVA/" style="font-size: 30px; color: #111">JAVA</a> <a href="/myblog/tags/RabbitMQ/" style="font-size: 12px; color: #ccc">RabbitMQ</a> <a href="/myblog/tags/Spring-MVC/" style="font-size: 12px; color: #ccc">Spring MVC</a> <a href="/myblog/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" style="font-size: 12px; color: #ccc">操作系统</a>
-            </div>
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/myblog/tags/RabbitMQ/" rel="tag"><i class="fa fa-tag"></i> RabbitMQ</a>
           </div>
-        
-      </div>
-      
-      
-      
-    </div>
-    
 
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/myblog/2020/07/05/%E6%90%AD%E5%BB%BAHadoop%E9%9B%86%E7%BE%A4%E4%B9%8B%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE%E7%B3%BB%E5%88%97(%E9%85%8D%E7%BD%AE%E9%9D%99%E6%80%81ip)/" rel="prev" title="搭建Hadoop集群之环境配置系列-配置静态ip">
+      <i class="fa fa-chevron-left"></i> 搭建Hadoop集群之环境配置系列-配置静态ip
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
     
-    
-    
+  </article>
+
+  
+  
+  
+
 
 
           </div>
@@ -287,6 +397,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-下载所需的文件"><span class="nav-number">1.</span> <span class="nav-text">1. 下载所需的文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-安装RabbitMQ"><span class="nav-number">2.</span> <span class="nav-text">2.安装RabbitMQ</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-配置自启动并启动服务"><span class="nav-number">3.</span> <span class="nav-text">3.配置自启动并启动服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-注意点"><span class="nav-number">4.</span> <span class="nav-text">4.注意点</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

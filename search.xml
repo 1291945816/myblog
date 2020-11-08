@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>CentOS 7 下RabbitMQ的 安装</title>
+    <url>/myblog/2020/11/08/CentOS%207%20%E4%B8%8BRabbitMQ%E7%9A%84%20%E5%AE%89%E8%A3%85/</url>
+    <content><![CDATA[<p>最近想深入学一下有关JAVA后台的一些中间件，这里选择了RabbitMQ消息中间件，并记录一下RabbitMQ的安装过程。</p>
+<a id="more"></a>
+
+<h2 id="1-下载所需的文件"><a href="#1-下载所需的文件" class="headerlink" title="1. 下载所需的文件"></a>1. 下载所需的文件</h2><p><img src="https://raw.githubusercontent.com/1291945816/Images/master/file_need.png" alt=""></p>
+<p>为了安装<code>rabbit-server</code>，你需要自己去下载上图所需的三个文件。除了以<code>rabbitmq-server</code>开头的这个文件外，其他是是安装Rabbitmq是必需的依赖环境，版本关系最好是官网查阅确定一下。我这里提供这三个文件的压缩包下载。</p>
+<blockquote>
+<p>链接：<a href="https://pan.baidu.com/s/1f2QCvx__tzT7aFrIx9KjjQ" target="_blank" rel="noopener">https://pan.baidu.com/s/1f2QCvx__tzT7aFrIx9KjjQ</a><br>提取码：0ijz </p>
+</blockquote>
+<p>不过还是推荐去官网下载 <a href="https://www.rabbitmq.com/" target="_blank" rel="noopener">官网</a></p>
+<h2 id="2-安装RabbitMQ"><a href="#2-安装RabbitMQ" class="headerlink" title="2.安装RabbitMQ"></a>2.安装RabbitMQ</h2><p>因为下载的文件是<code>rpm</code>类型的文件，所以这里使用<code>rpm</code>命令进行安装，该命令的具体使用自行百度。下面的是具体的安装命令:</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 首先去到那三个文件的文件夹下</span></span><br><span class="line">cd /home # 这里是我文件的放置处</span><br><span class="line"><span class="meta">#</span><span class="bash"> 然后就执行下面命令即可 rabbit-server一定是最后安装的</span></span><br><span class="line">rpm -ivh ./socat-1.7.3.2-2.el7.x86_64.rpm</span><br><span class="line">rpm -ivh ./erlang-23.0.3-1.el7.x86_64.rpm </span><br><span class="line">rpm -ivh rabbitmq-server-3.8.9-1.el7.noarch.rpm</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-配置自启动并启动服务"><a href="#3-配置自启动并启动服务" class="headerlink" title="3.配置自启动并启动服务"></a>3.配置自启动并启动服务</h2><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 配置自启动</span></span><br><span class="line">chkconfig rabbitmq-server on</span><br><span class="line"><span class="meta">#</span><span class="bash"> 为了能够使用网页版的后台管理，要启用后台管理插件</span></span><br><span class="line">rabbitmq-plugins enable rabbitmq_management</span><br><span class="line"><span class="meta">#</span><span class="bash"> 启动服务</span></span><br><span class="line">systemctl start rabbitmq-server</span><br></pre></td></tr></table></figure>
+
+<p>执行完上面的命令后，你通过在浏览器输入</p>
+<blockquote>
+<p><a href="http://server-ip:15672" target="_blank" rel="noopener">http://server-ip:15672</a> 这里server-ip是你服务器的ip或者你电脑的ip</p>
+</blockquote>
+<p>你应该能够看到这样的界面</p>
+<p><img src="https://raw.githubusercontent.com/1291945816/Images/master/rabbit-server-img.png" alt=""></p>
+<p>你如果输入默认账号:guest 密码:guest ，在其他电脑上就会显示图内的信息，这是说明该默认账号需要在本地登录才行，所以在这里我们需要去增加一个管理用户，使得能够登录该后台，下面是相关的命令:</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">rabbitmqctl add_user rabbitmq rabbitmq #这里后面两项分别是账户名以及密码</span><br><span class="line">rabbitmqctl set_user_tags fort administrator</span><br><span class="line">rabbitmqctl set_permissions -p / rabbitmq '.*' '.*' '.*' #这里是设置它的权限</span><br></pre></td></tr></table></figure>
+
+<p>上述三个命令就完成了创建一个rabbitmq用户，并且该用户能够在非本地的主机上登录后台。</p>
+<h2 id="4-注意点"><a href="#4-注意点" class="headerlink" title="4.注意点"></a>4.注意点</h2><p>上面就是RabbitMQ的一个简易安装过程,我之前曾想通过新增一个配置文件，进行配置，但是发现无论怎么做，它都是启动失败，找不到原因，但删掉那个文件便可以成功运行了。该问题可能要等到我后面继续深入学习才能回答了，所以在安装这个版本的时候，就先不要增加配置文件。</p>
+]]></content>
+      <categories>
+        <category>后端</category>
+        <category>中间件</category>
+      </categories>
+      <tags>
+        <tag>RabbitMQ</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C语言使用PV操作实现读者-写者问题</title>
     <url>/myblog/2020/06/22/C%E8%AF%AD%E8%A8%80%E4%BD%BF%E7%94%A8PV%E6%93%8D%E4%BD%9C%E5%AE%9E%E7%8E%B0%E8%AF%BB%E8%80%85-%E5%86%99%E8%80%85%E9%97%AE%E9%A2%98/</url>
     <content><![CDATA[<h2 id="开局一张图"><a href="#开局一张图" class="headerlink" title="开局一张图"></a>开局一张图</h2><p><img src="https://img-blog.csdnimg.cn/20200426214818760.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Mjc5MjA4OA==,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"></p>
@@ -64,7 +101,7 @@
 
 ]]></content>
       <categories>
-        <category>JAVA</category>
+        <category>后端</category>
         <category>Spring</category>
       </categories>
       <tags>
