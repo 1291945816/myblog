@@ -6,7 +6,7 @@
   <link href="/myblog/atom.xml" rel="self"/>
   
   <link href="http://1291945816.github.io/myblog/"/>
-  <updated>2020-11-09T09:05:40.863Z</updated>
+  <updated>2021-04-03T10:03:18.036Z</updated>
   <id>http://1291945816.github.io/myblog/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>正交试验测试用例生成平台使用</title>
+    <link href="http://1291945816.github.io/myblog/2021/04/03/%E6%AD%A3%E4%BA%A4%E8%AF%95%E9%AA%8C%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E7%94%9F%E6%88%90%E5%B9%B3%E5%8F%B0%E4%BD%BF%E7%94%A8/"/>
+    <id>http://1291945816.github.io/myblog/2021/04/03/%E6%AD%A3%E4%BA%A4%E8%AF%95%E9%AA%8C%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E7%94%9F%E6%88%90%E5%B9%B3%E5%8F%B0%E4%BD%BF%E7%94%A8/</id>
+    <published>2021-04-03T10:01:22.000Z</published>
+    <updated>2021-04-03T10:03:18.036Z</updated>
+    
+    <content type="html"><![CDATA[<p>这是一个帮助文档</p><a id="more"></a>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;这是一个帮助文档&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="软件测试" scheme="http://1291945816.github.io/myblog/categories/%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95/"/>
+    
+      <category term="java" scheme="http://1291945816.github.io/myblog/categories/%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95/java/"/>
+    
+    
+      <category term="软件测试" scheme="http://1291945816.github.io/myblog/tags/%E8%BD%AF%E4%BB%B6%E6%B5%8B%E8%AF%95/"/>
+    
+      <category term="java" scheme="http://1291945816.github.io/myblog/tags/java/"/>
+    
+  </entry>
   
   <entry>
     <title>java下利用RabbitMQ实现简单的点对点模型(生产者-消费者)</title>
